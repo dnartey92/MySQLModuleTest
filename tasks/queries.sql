@@ -30,7 +30,7 @@ Jó munkát!
     Melyik évben nyerte el egy ország legkorábban a függetlenségét?
     Írj lekérdezést, amely visszaadja azt az évszámot, amikor az első ország független lett! (IndepYear)
 
-    Elvárt eredmény:
+    Elvárt eredmény:SELECT MIN(`IndepYear`) FROM `country`;
         -1523
 */
 
@@ -52,7 +52,7 @@ Jó munkát!
     Melyek azok a városok, amelyeknél a város neve ugyanaz, mint a körzeté?
     Írj lekérdezést, amely visszaadja a városok összes adatát, amelyeknél a név megegyezik a körzet nevével! (District)
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT * FROM `city` WHERE `Name` = `District`;
         550 rekord
         ID szerint növekvő sorrendben az első 5 darab: 2, 3, 8, 11, 34
         ID szerint növekvő sorrendben az utolsó 3 darab: 4076, 4078, 4079
@@ -65,7 +65,9 @@ Jó munkát!
     Írj lekérdezést, amely visszaadja az ország nevét és az államfő nevét, amennyiben az államfő neve tartalmazza
     a fent leírt szavak bármelyikét! (HeadOfState)
 
-    Elvárt eredmény:
+    Elvárt eredmény:SELECT `Name`,`HeadOfState`  
+                    FROM `country` 
+                    WHERE `HeadOfState` LIKE '%Ahmad%' OR `HeadOfState` LIKE '%Ahmed%' OR `HeadOfState` LIKE '%Hamad%';
         7 rekord
         országnevek: Bangladesh, Bahrain, Kuwait, Mauritania, Qatar, Sudan, Sierra Leone
 */
@@ -77,7 +79,8 @@ Jó munkát!
     Írj lekérdezést, amely visszaadja azoknak az országoknak az összes adatát, ahol nem szerepel várható életkor (LifeExpectancy),
     de nem lakatlanok.
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT * FROM `country`
+                     WHERE `LifeExpectancy` IS NULL AND `Population` > 0;
         10 rekord
         kontinensek: Oceania (7 db), Europe (2), South America (1)
 */
@@ -89,7 +92,9 @@ Jó munkát!
     Írj lekérdezést, amely visszaadja az ország kódját, nevét, a GNP-t és a GNPOld-ot azokról az országokról,
     ahol a GNPOld nagyobb, mint a GNP!
 
-    Elvárt eredmény:
+    Elvárt eredmény:SELECT `Code`,`Name`,`GNP`,`GNPOld` 
+                            FROM `country` 
+                            WHERE `GNPOld` > `GNP`;
         63 rekord
 */
 
@@ -100,7 +105,10 @@ Jó munkát!
     Írj lekérdezést, amely visszaadja a nyelvek nevét, ahol a név 'ian'-ra végződik!
     Mindegyik nyelv csak egyszer szerepeljen a találatok között, és rendezd őket név szerint ABC-sorrendbe!
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT DISTINCT `Language` 
+                     FROM `countrylanguage` 
+                     WHERE `Language` LIKE '%ian' 
+                     ORDER BY `Language`;
         29 rekord
 */
 
@@ -111,7 +119,10 @@ Jó munkát!
     Írj lekérdezést, amely visszaadja a régiót és a régióban található országok darabszámát,
     ahol a régióban szerepel az, hogy 'Europe'!
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT `Region`, COUNT(*) 
+                     FROM `country`
+                     WHERE `country`.`Region` LIKE '%Europe%'
+                     GROUP BY `Region`;
         Southern Europe: 15
         Western Europe: 9
         Eastern Europe 10
@@ -125,7 +136,9 @@ Jó munkát!
     méghozzá az ország neve szerint ABC-sorrendben!
     A találati listában minden ország szerepeljen - még akkor is, ha nincsen fővárosa.
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT `Code`,`Name`,`Capital` 
+                     FROM `country` 
+                     ORDER BY `Name`;
         239 rekord
         első országkód: AFG
         utolsó országkód: ZWE
@@ -137,7 +150,8 @@ Jó munkát!
     Melyek azok a városok, amelyeknél a populáció száma pontosan 3 számjegyből áll?
     Írj lekérdezést, amely visszaadja azoknak a városoknak az összes adatát, amelyeknél a lakosság száma pontosan 3 számjegyből áll!
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT * FROM `city` 
+                     WHERE `Population` LIKE '___';
         10 rekord
         a városok ID-ja: 61, 62, 1791, 2316, 2317, 2728, 2805, 2806, 3333, 3538
 */
@@ -150,7 +164,11 @@ Jó munkát!
     amelyek valamilyen 'Nordic Countries' régióhoz tartozó országban vannak,
     méghozzá országkód szerint ABC-sorrendben (növekvő), populáció szerint csökkenő sorrendben!
 
-    Elvárt eredmény:
+    Elvárt eredmény:SELECT * FROM `country` 
+                    INNER JOIN `city` 
+                    ON `country`.`Code` = `city`.`CountryCode`
+                    WHERE `country`.`Region` = "Nordic Countries"
+                    ORDER BY `country`.`Name`, `city`.`Population` DESC;
         35 rekord
         országkódok, amelyek szerepelnek a listában: DNK, FIN, FRO, ISL, NOR, SJM, SWE
 */
@@ -164,7 +182,11 @@ Jó munkát!
     hogy nincs érték megadva az `IndepYear`-nél, vagy 1500 előtt nyerték el a függetlenségüket!
     A találatokat rendezd a darabszám szerint csökkenő sorrendbe!
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT `Region`, COUNT(*) 
+                     FROM `country`
+                     WHERE `IndepYear` < 1500 OR IndepYear IS NULL
+                     GROUP BY `Region`
+                     ORDER BY COUNT(*);
         19 rekord
         legkisebb: Northern Africa (1)
         legnagyobb: Caribbean (11)
@@ -176,7 +198,10 @@ Jó munkát!
     Melyek azok az országok, amelyekben nem hivatalos nyelvként beszélik az angolt?
     Írj lekérdezést, amely visszaadja az országok összes adatát, amelyekben az angol nem hivatalos nyelv!
 
-    Elvárt eredmény:
+    Elvárt eredmény:SELECT * FROM `countrylanguage` 
+                             INNER JOIN `country` 
+                             ON `country`.`Code` = `countrylanguage`.`CountryCode`
+                             WHERE `countrylanguage`.`Language` = "English" AND `countrylanguage`.`IsOfficial`= 'F';
         16 rekord
         országkódok: ABW, ANT, BHR, BRN, COK, DNK, ISL, JPN, KWT, MAC, MCO, MDV, MYS, NOR, PRI, TTO
 */
@@ -187,7 +212,10 @@ Jó munkát!
     Mely országokhoz nem tartozik egy város sem?
     Írj lekérdezést, amely visszaadja azoknak az országoknak az összes adatát, amelyekhez nem tartozik város az adatbázisban!
 
-    Elvárt eredmény:
+    Elvárt eredmény: SELECT * FROM `country`
+                     LEFT JOIN `city`
+                     ON `country`.`Code` = `city`.`CountryCode`
+                     WHERE `city`.`ID`IS NULL;
         7 rekord
         országkódok: ATA, ATF, BVT, HMD, IOT, SGS, UMI
 */
@@ -199,7 +227,11 @@ Jó munkát!
     Írj lekérdezést, amely visszaadja az ország nevét, kontinensét, régióját, a nyelv nevét és százalékát, amelyre igaz,
     hogy a nyelv százaléka 0!
 
-    Elvárt eredmény:
+    Elvárt eredmény:SELECT `country`.`Name`,`country`.`Continent`,`country`.`Region`,`countrylanguage`.`Language`, `countrylanguage`.`Percentage`
+                    FROM `country`
+                    INNER JOIN `countrylanguage`
+                    ON `country`.`Code` = `countrylanguage`.`CountryCode`
+                    WHERE `countrylanguage`.`Percentage` = 0;
         65 rekord
 */
 
